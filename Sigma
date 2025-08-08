@@ -1,4 +1,3 @@
-```lua
 local Orion = loadstring(game:HttpGet(('https://raw.githubusercontent.com/shlexware/Orion/main/source')))()
 local Workspace = game:GetService("Workspace")
 local Player = game:GetService("Players").LocalPlayer
@@ -54,4 +53,3 @@ local Toggle2 = Section:MakeToggle({
         end
     end
 })
-```
