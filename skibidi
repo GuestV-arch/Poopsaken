@@ -1,0 +1,45 @@
+``lua
+-- // Services \\ --
+local Players = game:GetService("Players")
+local Workspace = game:GetService("Workspace")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local UserInputService = game:GetService("UserInputService")
+-- // LocalPlayer \\ --
+local LocalPlayer = Players.LocalPlayer
+-- // Character \\ --
+local Character = LocalPlayer.Character
+-- // Invis \\ --
+for _,v in pairs(Character:GetChildren()) do
+    if v:IsA("Part") then
+        v.Transparency = 1
+    end
+end
+-- // Auto Farm Gen \\ --
+while true do
+    for _,gen in pairs(Workspace.Generators:GetChildren()) do
+        LocalPlayer.Character.HumanoidRootPart.CFrame = gen.ClickDetector.Hitbox.CFrame
+        UserInputService:MouseLocation = gen.ClickDetector.Hitbox.Position
+        wait(0.1)
+        UserInputService:MouseButton1Click()
+        wait(0.5)
+    end
+end
+-- // Auto Rebirth \\ --
+game:GetService("RunService").RenderStepped:Connect(function()
+    if LocalPlayer.PlayerStats.Level.Value >= LocalPlayer.PlayerStats.MaxLevel.Value then
+        game:GetService("ReplicatedStorage").Remotes.Rebirth:FireServer()
+    end
+end)
+-- // Auto Aura \\ --
+while true do
+    game:GetService("ReplicatedStorage").Remotes.Aura:FireServer()
+    wait(0.5)
+end
+-- // Auto Collect \\ --
+while true do
+    for _,coin in pairs(Workspace.Coins:GetChildren()) do
+        LocalPlayer.Character.HumanoidRootPart.CFrame = coin.CFrame
+        wait(0.5)
+    end
+end
+```
