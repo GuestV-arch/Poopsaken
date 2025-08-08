@@ -1,0 +1,57 @@
+```lua
+local Orion = loadstring(game:HttpGet(('https://raw.githubusercontent.com/shlexware/Orion/main/source')))()
+local Workspace = game:GetService("Workspace")
+local Player = game:GetService("Players").LocalPlayer
+
+Orion:MakeNotification({
+    Name = "Forsaken Autofarm",
+    Content = "GUI loaded, start farming?"
+})
+
+local GUI = Orion:MakeGUI({
+    Name = "Forsaken Autofarm",
+    HoverText = "Autofarm for Forsaken"
+})
+
+local Tab = GUI:MakeTab({
+    Name = "Autofarm Settings",
+    Icon = "rbxassetid://4483345998"
+})
+
+local Section = Tab:MakeSection({
+    Name = "Autofarm"
+})
+local Toggle = Section:MakeToggle({
+    Name = "Autofarm Generators",
+    CurrentValue = false,
+    Callback = function(Value)
+        getgenv().autofarm = Value
+        while autofarm do
+            for _,v in pairs(Workspace:GetChildren()) do
+                if v.Name == "Generator" then
+                    if v:FindFirstChild("ClickDetector") then
+                        fireclickdetector(v.ClickDetector)
+                    end
+                end
+            end
+            wait()
+        end
+    end
+})
+local Toggle2 = Section:MakeToggle({
+    Name = "Invisibility",
+    CurrentValue = false,
+    Callback = function(Value)
+        getgenv().invis = Value
+        while invis do
+            Player.Character.Humanoid.WalkSpeed = 0
+            for _,v in pairs(Player.Character:GetChildren()) do
+                if v:IsA("Part") then
+                    v.Transparency = 1
+                end
+            end
+            wait()
+        end
+    end
+})
+```
