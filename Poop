@@ -1,0 +1,47 @@
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local player = Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+
+local roundTime = ReplicatedStorage:WaitForChild("RoundTime")
+
+local function getGenerators()
+    local gens = {}
+    for _, obj in pairs(workspace:GetChildren()) do
+        if obj.Name == "Generator" and obj:FindFirstChild("Fix") and obj.Fix:IsA("RemoteEvent") then
+            table.insert(gens, obj)
+        end
+    end
+    return gens
+end
+
+local function fixGenerator(generator)
+    generator.Fix:FireServer()
+end
+
+local function fixAllGenerators()
+    local generators = getGenerators()
+    for _, gen in ipairs(generators) do
+        if humanoidRootPart and gen then
+            local targetCFrame = gen.PrimaryPart and gen.PrimaryPart.CFrame or gen.CFrame
+            local inFrontCFrame = targetCFrame * CFrame.new(0, 0, -3)
+            humanoidRootPart.CFrame = inFrontCFrame
+            wait(3)  -- 3000 milliseconds delay before triggering fix
+            fixGenerator(gen)
+            wait(3)  -- 3000 milliseconds delay after fixing before next generator
+        end
+    end
+    print("Finished fixing all generators")
+end
+
+roundTime:GetPropertyChangedSignal("Value"):Connect(function()
+    if roundTime.Value == "0:00" then
+        fixAllGenerators()
+    end
+end)
+
+if roundTime.Value == "0:00" then
+    fixAllGenerators()
+end
