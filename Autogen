@@ -1,0 +1,100 @@
+-- Forsaken Multi-Feature Script for Roblox
+-- Features: Autogen, Infinite Stamina, Autofarm (starts at round 0:00), Serverhop with Block
+-- For educational and video content purposes only
+
+getgenv().Config = {
+    AutoGenerator = true,
+    InfiniteStamina = true,
+    AutoFarm = false, -- Will be enabled when round starts
+    Speed = 1.5,
+}
+
+-- === Auto Generator Function ===
+function autoGen()
+    while getgenv().Config.AutoGenerator do
+        for _, gen in pairs(workspace.Generators:GetChildren()) do
+            if gen.Status.Value == "NeedsRepair" or gen.Status.Value == "Idle" then
+                game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = gen.CFrame
+                fireproximityprompt(gen.ProximityPrompt)
+                wait(0.2)
+            end
+        end
+        wait(1)
+    end
+end
+
+-- === Infinite Stamina Function ===
+function infiniteStamina()
+    while getgenv().Config.InfiniteStamina do
+        local char = game.Players.LocalPlayer.Character
+        if char and char:FindFirstChild("Stamina") then
+            char.Stamina.Value = 100
+        end
+        wait(0.1)
+    end
+end
+
+-- === Autofarm Enable at Round Start (0:00) ===
+spawn(function()
+    -- Adjust "RoundTimer" to match your game's actual timer label
+    local roundTimer = game.Players.LocalPlayer.PlayerGui:WaitForChild("RoundTimer")
+    while true do
+        if roundTimer.Text == "0:00" then
+            getgenv().Config.AutoFarm = true
+            print("Autofarm enabled at round start!")
+            break -- remove this if you want it to repeat each round
+        end
+        wait(0.1)
+    end
+end)
+
+-- === Autofarm Logic (SAMPLE, customize as needed) ===
+function autoFarmLoop()
+    while getgenv().Config.AutoFarm do
+        -- Autofarm logic here, example: repair generators, collect items, etc.
+        print("Autofarm running...")
+        wait(1)
+    end
+end
+
+-- === Serverhop with Block After 3 Visits ===
+_G.VisitedServers = _G.VisitedServers or {}
+local PLACE_ID = game.PlaceId
+local visitLimit = 3
+
+function hopToNewServer()
+    local HttpService = game:GetService("HttpService")
+    local servers = HttpService:JSONDecode(
+        game:HttpGet("https://games.roblox.com/v1/games/".. PLACE_ID .."/servers/Public?sortOrder=Asc&limit=100")
+    )
+    for _, server in ipairs(servers.data) do
+        local id = server.id
+        _G.VisitedServers[id] = (_G.VisitedServers[id] or 0)
+        if id ~= game.JobId and _G.VisitedServers[id] < visitLimit then
+            _G.VisitedServers[id] = _G.VisitedServers[id] + 1
+            print("[Serverhop] Joining server:", id, "Visit count:", _G.VisitedServers[id])
+            game:GetService("TeleportService"):TeleportToPlaceInstance(PLACE_ID, id)
+            break
+        end
+    end
+end
+
+-- === Main Toggles ===
+if getgenv().Config.AutoGenerator then
+    spawn(autoGen)
+end
+if getgenv().Config.InfiniteStamina then
+    spawn(infiniteStamina)
+end
+spawn(function()
+    while true do
+        if getgenv().Config.AutoFarm then
+            spawn(autoFarmLoop)
+            break
+        end
+        wait(0.5)
+    end
+end)
+-- Example usage: call hopToNewServer() to serverhop after farming
+
+print("Forsaken All-in-One Script Loaded. Features: Autogen, Infinite Stamina, Smart Autofarm, Serverhop.")
